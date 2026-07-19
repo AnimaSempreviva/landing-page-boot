@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="de" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boat Detailing Bodensee | Premium Mobile Boot Innenreinigung & Yachtpflege</title>
+    <meta name="description" content="Exklusive mobile Bootsaufbereitung & Yachtpflege am Bodensee. Spezialisiert auf luxuriöse Boot Innenreinigung direkt am Liegeplatz. Polster, Leder, Holz & Teppiche.">
+    <meta name="keywords" content="Bootsaufbereitung Bodensee, Boat Detailing Bodensee, Bootsreinigung Bodensee, Boot Innenreinigung Bodensee, Yachtpflege Bodensee, Friedrichshafen, Konstanz, Lindau">
+    <meta name="author" content="Boat Detailing Bodensee">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            50: '#f4f6fa',
+                            100: '#e5ebf4',
+                            800: '#0B1B3D',
+                            900: '#071127',
+                        },
+                        gold: {
+                            100: '#fbf7eb',
+                            500: '#D4AF37',
+                            600: '#C5A059',
+                            700: '#A9843B',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- JSON-LD Schema.org Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "Boat Detailing Bodensee",
+      "image": "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&w=1200&q=80",
+      "description": "Premium mobile Innenraumaufbereitung und exklusive Yachtpflege direkt am Liegeplatz rund um den Bodensee. Spezialisiert auf Polster, Leder, Edelholz und Cockpit.",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Friedrichshafen",
+        "addressRegion": "Baden-Württemberg",
+        "addressCountry": "DE"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "47.6542",
+        "longitude": "9.4792"
+      },
+      "url": "https://boat-detailing-bodensee.de",
+      "telephone": "+4917612345678",
+      "priceRange": "$$$",
+      "areaServed": [
+        "Friedrichshafen", "Konstanz", "Überlingen", "Lindau", "Meersburg", 
+        "Kressbronn", "Immenstaad", "Langenargen", "Romanshorn", "Kreuzlingen"
+      ]
+    }
+    </script>
+
+    <style>
+        /* Custom scrollbar matching premium theme */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #071127;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #C5A059;
+            border-radius: 4px;
+        }
+        .text-gold-gradient {
+            background: linear-gradient(135deg, #F3E7C4 0%, #D4AF37 50%, #A9843B 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-900 font-sans leading-relaxed selection:bg-gold-500 selection:text-navy-900">
+
+    <script>
+        // SPA state management
+        const state = {
+            activePage: 'home',
+            activeLocation: null,
+            formSubmitted: false,
+            calculator: {
+                length: 8,
+                condition: 'normal',
+                woodCare: false,
+                leatherCare: false,
+                carpetCare: false
+            }
+        };
+
+        function navigate(pageId, locationId = null) {
+            state.activePage = pageId;
+            state.activeLocation = locationId;
+            
+            // Render view dynamic highlights
+            document.querySelectorAll('[data-page]').forEach(el => {
+                if (el.id === pageId + '-page') {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            });
+
+            // Update Active Link classes in both menus
+            document.querySelectorAll('.nav-link').forEach(link => {
+                const linkPage = link.getAttribute('href').replace('#', '').split('/')[0];
+                if (linkPage === pageId) {
+                    link.classList.add('text-gold-500', 'border-b-2', 'border-gold-500');
+                    link.classList.remove('text-gray-300', 'text-gray-700');
+                } else {
+                    link.classList.remove('text-gold-500', 'border-b-2', 'border-gold-500');
+                }
+            });
+
+            // If a specific location landing page is requested
+            if (pageId === 'standort' && locationId) {
+                renderLocationPage(locationId);
+            }
+
+            // Scroll smoothly back to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // Close mobile menu if open
+            const mobMenu = document.getElementById('mobile-menu');
+            if (mobMenu) mobMenu.classList.add('hidden');
+        }
+
+        // Initialize routing based on hash
+        window.addEventListener('DOMContentLoaded', () => {
+            const handleHash = () => {
+                const hash = window.location.hash || '#home';
+                const parts = hash.substring(1).split('/');
+                const page = parts[0];
+                const subParam = parts[1] || null;
+                
+                if (['home', 'leistungen', 'preise', 'faq', 'ueber-uns', 'kontakt', 'standorte', 'blog', 'standort', 'impressum', 'datenschutz', 'haftungsbeschraenkung'].includes(page)) {
+                    navigate(page, subParam);
+                } else {
+                    navigate('home');
+                }
+            };
+            window.addEventListener('hashchange', handleHash);
+            handleHash();
+        });
+    </script>
+
+    <header class="sticky top-0 z-50 bg-navy-900 border-b border-navy-800 backdrop-blur-md bg-opacity-95 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo -->
+                <a href="#home" class="flex items-center space-x-3 group" onclick="navigate('home')">
+                    <div class="relative flex items-center justify-center w-12 h-12 rounded-full border border-gold-500 overflow-hidden bg-navy-800">
+                        <span class="text-gold-500 font-serif font-bold text-xl tracking-wider group-hover:scale-110 transition duration-300">B</span>
+                    </div>
+                    <div>
+                        <span class="block text-lg font-serif font-bold tracking-widest text-white group-hover:text-gold-500 transition duration-300">BOAT DETAILING</span>
+                        <span class="block text-xs font-sans tracking-widest text-gold-500 uppercase">Bodensee</span>
+                    </div>
+                </a>
+
+                <!-- Desktop Navigation Links -->
+                <nav class="hidden lg:flex space-x-8 text-sm font-medium">
+                    <a href="#home" class="nav-link py-2 text-gray-300 hover:text-gold-500 transition duration-200">Startseite</a>
+                    <a href="#leistungen" class="nav-link py-2 text-gray-300 hover:text-gold-500 transition duration-200">Leistungen</a>
+                    <a href="#preise" class="nav-link py-2 text-gray-300 hover:text-gold-500 transition duration-200">Preise</a>
+                    <a href="#standorte" class="nav-link py-2 text-gray-300 hover:text-gold-500 transition duration-200">Standorte</a>
+                    <a href="#faq" class="nav-link py-2 text-gray-300 hover:text-gold-500 transition duration-200">FAQ</a>
+                    <a href="#blog" class="nav-link py-2 text-gray-300 hover:text-gold-500 transition duration-200">Blog</a>
+                    <a href="#ueber-uns" class="nav-link py-2 text-gray-300 hover:text-gold-500 transition duration-200">Über Uns</a>
+                    <a href="#kontakt" class="nav-link py-2 text-gray-300 hover:text-gold-500 transition duration-200">Kontakt</a>
+                </nav>
+
+                <!-- Premium CTA -->
+                <div class="hidden lg:flex items-center space-x-4">
+                    <a href="#kontakt" onclick="navigate('kontakt')" class="relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-xs font-semibold uppercase tracking-wider text-navy-900 rounded-sm group bg-gradient-to-br from-gold-500 via-gold-600 to-gold-700 group-hover:from-gold-600 group-hover:to-gold-500 focus:ring-2 focus:outline-none focus:ring-gold-500">
+                        <span class="relative px-6 py-3 transition-all ease-in duration-75 bg-white rounded-xs group-hover:bg-opacity-0 group-hover:text-white transition-colors duration-300">
+                            Jetzt Termin anfragen
+                        </span>
+                    </a>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="lg:hidden flex items-center">
+                    <button type="button" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="text-gray-300 hover:text-white focus:outline-none">
+                        <i class="fa-solid fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-navy-900 border-t border-navy-800 px-4 pt-4 pb-6 space-y-3 shadow-2xl">
+            <a href="#home" onclick="navigate('home')" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-gold-500 hover:bg-navy-800 rounded">Startseite</a>
+            <a href="#leistungen" onclick="navigate('leistungen')" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-gold-500 hover:bg-navy-800 rounded">Leistungen</a>
+            <a href="#preise" onclick="navigate('preise')" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-gold-500 hover:bg-navy-800 rounded">Preise</a>
+            <a href="#standorte" onclick="navigate('standorte')" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-gold-500 hover:bg-navy-800 rounded">Standorte</a>
+            <a href="#faq" onclick="navigate('faq')" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-gold-500 hover:bg-navy-800 rounded">FAQ</a>
+            <a href="#blog" onclick="navigate('blog')" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-gold-500 hover:bg-navy-800 rounded">Blog</a>
+            <a href="#ueber-uns" onclick="navigate('ueber-uns')" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-gold-500 hover:bg-navy-800 rounded">Über Uns</a>
+            <a href="#kontakt" onclick="navigate('kontakt')" class="block px-3 py-2 text-base font-medium text-gold-500 hover:bg-navy-800 rounded font-semibold">Kontakt / Termin anfragen</a>
+        </div>
+    </header>
+
+    <!-- MAIN VIEWS CONTAINER -->
+    <main class="min-h-[80vh]">
+
+        <div id="home-page" data-page>
+            <!-- Premium Riva-Inspired Hero Section -->
+            <section class="relative h-[85vh] bg-navy-900 overflow-hidden flex items-center">
+                <!-- Overlay Gradients simulating high luxury -->
+                <div class="absolute inset-0 z-0 bg-cover bg-center opacity-40 mix-blend-multiply" style="background-image: url('https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?auto=format&fit=crop&w=1920&q=80')"></div>
+                <div class="absolute inset-0 z-10 bg-gradient-to-r from-navy-900 via-navy-900/80 to-transparent"></div>
+                
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 w-full">
+                    <div class="max-w-3xl">
+                        <!-- Tiny Accent Badge -->
+                        <div class="inline-flex items-center space-x-2 bg-gold-500/10 border border-gold-500/30 px-3 py-1 rounded-full mb-6">
+                            <span class="w-2 h-2 rounded-full bg-gold-500 animate-pulse"></span>
+                            <span class="text-xs font-semibold text-gold-500 uppercase tracking-widest">Exklusive Innenraumaufbereitung</span>
+                        </div>
+                        
+                        <h1 class="text-4xl sm:text-5xl lg:text-7xl font-serif font-semibold text-white tracking-tight leading-tight">
+                            Makellose Eleganz <br>
+                            <span class="text-gold-gradient">für Ihre Yacht.</span>
+                        </h1>
+                        
+                        <p class="mt-6 text-lg text-gray-300 max-w-xl font-light">
+                            Professionelles <strong class="font-medium text-white">Boat Detailing Bodensee</strong>: Wir pflegen Leder, Alcantara, Teppiche, Edelholz & Pantry Ihrer Yacht direkt an Ihrem Liegeplatz. Vollkommen mobil, kompromisslos präzise.
+                        </p>
+                        
+                        <!-- Mini Checklist asserting strict focus -->
+                        <div class="mt-6 flex flex-wrap gap-4 text-xs tracking-wide uppercase text-gray-300">
+                            <span class="flex items-center gap-1.5"><i class="fa-solid fa-check text-gold-500"></i> Keine Werftarbeiten</span>
+                            <span class="flex items-center gap-1.5"><i class="fa-solid fa-check text-gold-500"></i> Rein mobil direkt am Hafen</span>
+                            <span class="flex items-center gap-1.5"><i class="fa-solid fa-check text-gold-500"></i> Fokus auf edle Materialien</span>
+                        </div>
+
+                        <!-- Hero CTA buttons -->
+                        <div class="mt-8 flex flex-col sm:flex-row gap-4">
+                            <a href="#kontakt" onclick="navigate('kontakt')" class="inline-flex items-center justify-center px-8 py-4 text-sm font-semibold tracking-wider text-navy-900 uppercase bg-gold-500 hover:bg-gold-600 rounded transition duration-300 font-sans shadow-lg">
+                                <i class="fa-regular fa-calendar-check mr-2"></i> Jetzt Termin anfragen
+                            </a>
+                            <a href="#leistungen" onclick="navigate('leistungen')" class="inline-flex items-center justify-center px-8 py-4 text-sm font-semibold tracking-wider text-white uppercase border border-white/20 hover:border-white hover:bg-white/5 rounded transition duration-300">
+                                Unsere Leistungen entfalten
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Stats & Value Proposition -->
+            <section class="py-16 bg-navy-900 border-t border-navy-800 text-white">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
+                        <div class="p-6 border border-navy-800 rounded bg-navy-900/50">
+                            <div class="text-4xl font-serif text-gold-500 font-bold mb-2">100%</div>
+                            <div class="text-sm uppercase tracking-widest text-gray-400">Mobile Innenpflege</div>
+                            <p class="text-xs text-gray-500 mt-2">Wir kommen direkt an Ihre Anlegestelle.</p>
+                        </div>
+                        <div class="p-6 border border-navy-800 rounded bg-navy-900/50">
+                            <div class="text-4xl font-serif text-gold-500 font-bold mb-2">1A</div>
+                            <div class="text-sm uppercase tracking-widest text-gray-400">Premium-Materialien</div>
+                            <p class="text-xs text-gray-500 mt-2">Ausgesuchte, pH-neutrale Reinigungsmittel.</p>
+                        </div>
+                        <div class="p-6 border border-navy-800 rounded bg-navy-900/50">
+                            <div class="text-4xl font-serif text-gold-500 font-bold mb-2">10+</div>
+                            <div class="text-sm uppercase tracking-widest text-gray-400">Häfen am Bodensee</div>
+                            <p class="text-xs text-gray-500 mt-2">Präsent an allen wichtigen Liegeplätzen.</p>
+                        </div>
+                        <div class="p-6 border border-navy-800 rounded bg-navy-900/50">
+                            <div class="text-4xl font-serif text-gold-500 font-bold mb-2">Null</div>
+                            <div class="text-sm uppercase tracking-widest text-gray-400">Risiko für Sie</div>
+                            <p class="text-xs text-gray-500 mt-2">Volle Haftpflichtversicherung für Yachten.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="py-24 bg-white">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center max-w-3xl mx-auto mb-16">
+                        <span class="text-gold-500 font-semibold tracking-widest uppercase text-xs">Visuelle Perfektion</span>
+                        <h2 class="text-3xl sm:text-4xl font-serif font-bold text-navy-800 mt-2">Sichtbare Verwandlung</h2>
+                        <p class="text-gray-600 mt-4 font-light">
+                            Ziehen Sie den Schieberegler nach links und rechts, um die Ergebnisse unserer tiefenwirksamen Bootsreinigung Bodensee auf edlem Marine-Leder und Cockpit-Interieur zu vergleichen.
+                        </p>
+                    </div>
+
+                    <!-- Slider Container -->
+                    <div class="relative w-full max-w-4xl mx-auto aspect-video rounded-xl overflow-hidden shadow-2xl select-none" id="before-after-container">
+                        <!-- Before Image (Base) -->
+                        <img src="https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?auto=format&fit=crop&w=1200&q=80" alt="Yacht Innenraum schmutzig" class="absolute inset-0 w-full h-full object-cover grayscale brightness-75">
+                        <div class="absolute bottom-4 left-4 bg-navy-900/80 text-white text-xs tracking-widest uppercase px-3 py-1 rounded z-20">
+                            Vorher (Vernachlässigt)
+                        </div>
+
+                        <!-- After Image (Overlay clipped) -->
+                        <div class="absolute inset-0 w-full h-full overflow-hidden" id="after-image-overlay" style="clip-path: inset(0 0 0 50%);">
+                            <img src="https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&w=1200&q=80" alt="Boat Detailing Bodensee Lederpflege" class="absolute inset-0 w-full h-full object-cover">
+                            <div class="absolute bottom-4 right-4 bg-gold-500/90 text-navy-900 text-xs tracking-widest uppercase px-3 py-1 rounded font-bold z-20">
+                                Nachher (Yachtpflege Bodensee)
+                            </div>
+                        </div>
+
+                        <!-- Center Divider Slider Handle -->
+                        <div class="absolute top-0 bottom-0 w-1 bg-gold-500 cursor-ew-resize z-30 flex items-center justify-center" id="slider-handle" style="left: 50%;">
+                            <div class="w-10 h-10 bg-gold-500 text-navy-900 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition duration-150">
+                                <i class="fa-solid fa-arrows-left-right"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Brand Philosophy: Apple/Porsche Minimalist Section -->
+            <section class="py-24 bg-navy-50">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                        <div class="relative">
+                            <div class="aspect-square rounded bg-navy-900 overflow-hidden relative shadow-xl">
+                                <img src="https://images.unsplash.com/photo-1505242859-548c415b228c?auto=format&fit=crop&w=800&q=80" alt="Bootsaufbereitung Bodensee Innen" class="w-full h-full object-cover opacity-80">
+                            </div>
+                            <!-- Small absolute positioning widget to enforce beauty -->
+                            <div class="absolute -bottom-8 -right-8 bg-white p-6 shadow-xl rounded max-w-xs border-l-4 border-gold-500">
+                                <p class="text-sm font-serif italic text-navy-900">
+                                    "Präzision ist nicht verhandelbar, wenn Sie die Wellen des Bodensees stilvoll erobern wollen."
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-6">
+                            <span class="text-gold-500 font-semibold tracking-widest uppercase text-xs">Exklusive Philosophie</span>
+                            <h2 class="text-4xl font-serif font-bold text-navy-800 leading-tight">Reinigung als Kunstform verstanden.</h2>
+                            <p class="text-gray-600 font-light text-lg">
+                                Wir haben uns bewusst gegen gewöhnliche Werft- und Mechanikerarbeiten entschieden. Warum? Weil absolute Meisterschaft Fokus erfordert. Unser Fokus liegt vollkommen auf der Veredelung des Innenraums Ihrer edlen Yacht.
+                            </p>
+                            <div class="space-y-4">
+                                <div class="flex items-start gap-4">
+                                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-gold-100 flex items-center justify-center text-gold-600 font-bold">1</div>
+                                    <div>
+                                        <h4 class="font-bold text-navy-800">Leder & Alcantara Tiefenpflege</h4>
+                                        <p class="text-gray-500 text-sm">Entfernung von hartnäckigen Salzrändern, Sonnencreme und Schweiß. Rückfettung mit Premium-Ölen.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-4">
+                                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-gold-100 flex items-center justify-center text-gold-600 font-bold">2</div>
+                                    <div>
+                                        <h4 class="font-bold text-navy-800">Edelholz & GFK Hochglanz-Veredelung</h4>
+                                        <p class="text-gray-500 text-sm">Mikrokratzerfreie Reinigung empfindlicher Paneele, Cockpit-Armaturen und Steuerräder.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-4">
+                                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-gold-100 flex items-center justify-center text-gold-600 font-bold">3</div>
+                                    <div>
+                                        <h4 class="font-bold text-navy-800">Geruchsbeseitigung & Desinfektion</h4>
+                                        <p class="text-gray-500 text-sm">Schonende Ozonbehandlung und Dampf-Sterilisierung der Pantry (Küche) und Naßzellen.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Testimonial Section -->
+            <section class="py-24 bg-navy-900 text-white relative overflow-hidden">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                    <div class="text-center max-w-3xl mx-auto mb-16">
+                        <span class="text-gold-500 font-semibold tracking-widest uppercase text-xs">Echte Meinungen</span>
+                        <h2 class="text-3xl sm:text-4xl font-serif font-bold mt-2">Was Yachtbesitzer sagen</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="p-8 border border-navy-800 rounded bg-navy-900/80">
+                            <div class="flex text-gold-500 space-x-1 mb-4">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                            </div>
+                            <p class="text-gray-300 italic text-sm mb-6">
+                                "Die Bootsreinigung Bodensee hat unser Riva-Cockpit phänomenal aufbereitet. Das Teakholz strahlt und das Leder duftet wie neu. Absoluter Premium-Service in Lindau."
+                            </p>
+                            <div class="font-bold text-sm text-white">Dr. Maximilian S., Lindau</div>
+                            <div class="text-xs text-gold-500">Yachtbesitzer (Riva Aquariva)</div>
+                        </div>
+                        <div class="p-8 border border-navy-800 rounded bg-navy-900/80">
+                            <div class="flex text-gold-500 space-x-1 mb-4">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                            </div>
+                            <p class="text-gray-300 italic text-sm mb-6">
+                                "Unglaublich praktischer Service! Sie kamen direkt zu unserem Liegeplatz in Konstanz. Kein umständliches Überführen in eine Werft. Alles perfekt sauber und geruchsfrei."
+                            </p>
+                            <div class="font-bold text-sm text-white">Sabine W., Konstanz</div>
+                            <div class="text-xs text-gold-500">Eignerin (Bavaria C45)</div>
+                        </div>
+                        <div class="p-8 border border-navy-800 rounded bg-navy-900/80">
+                            <div class="flex text-gold-500 space-x-1 mb-4">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                            </div>
+                            <p class="text-gray-300 italic text-sm mb-6">
+                                "Meine Yachtpflege Bodensee führe ich nur noch mit diesem Team durch. Die Polsterreinigung war tiefenwirksam, die Weinflecken im Teppich sind restlos verschwunden."
+                            </p>
+                            <div class="font-bold text-sm text-white">Bernhard M., Kressbronn</div>
+                            <div class="text-xs text-gold-500">Yachtbesitzer (Beneteau Oceanis)</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+
+        <div id="leistungen-page" data-page class="hidden bg-white py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <span class="text-gold-500 font-semibold tracking-widest uppercase text-xs">Exklusive Pflege</span>
+                    <h1 class="text-4xl font-serif font-bold text-navy-800 mt-2">Mobile Boot Innenreinigung Bodensee</h1>
+                    <p class="text-gray-600 mt-4 font-light">
+                        Wir revitalisieren jeden Millimeter Ihres Boot-Innenraums direkt vor Ort am Hafen. Entdecken Sie unser spezialisiertes Leistungsspektrum.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- S1: Upholstery & Leather -->
+                    <div class="bg-navy-50 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition duration-300">
+                        <div class="h-48 overflow-hidden bg-navy-900 relative">
+                            <img src="https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&w=400&q=80" alt="Polsterreinigung Boot" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-navy-900 to-transparent"></div>
+                            <h3 class="absolute bottom-4 left-4 text-white font-serif text-xl font-bold">Leder & Polsterpflege</h3>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-gray-600 text-sm mb-4 font-light">
+                                Intensive Tiefenreinigung und Veredelung aller Sitzelemente, Liegeflächen und Kabinenpolster. Beseitigt Flecken, Salzkrusten und beugt Schimmel sowie Rissbildung vor.
+                            </p>
+                            <ul class="text-xs text-navy-800 space-y-2 mb-6">
+                                <li><i class="fa-solid fa-circle-check text-gold-500 mr-2"></i> Porentiefe Reinigung mit Spezialschaum</li>
+                                <li><i class="fa-solid fa-circle-check text-gold-500 mr-2"></i> Hydrophobe Langzeit-Lederversiegelung</li>
+                                <li><i class="fa-solid fa-circle-check text-gold-500 mr-2"></i> Alcantara-Fasern Aufbürsten & Imprägnierung</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- S2: Teak, Wood & Cockpit -->
+                    <div class="bg-navy-50 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition duration-300">
+                        <div class="h-48 overflow-hidden bg-navy-900 relative">
+                            <img src="https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?auto=format&fit=crop&w=400&q=80" alt="Teakholzpflege Yacht" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-navy-900 to-transparent"></div>
+                            <h3 class="absolute bottom-4 left-4 text-white font-serif text-xl font-bold">Holz & Cockpit-Detailing</h3>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-gray-600 text-sm mb-4 font-light">
+                                Veredelung empfindlicher Armaturen, Steuerräder, Edelstahl-Applikationen und exklusiven Yacht-Hölzern wie Teak oder Mahagoni im Innenraum.
+                            </p>
+                            <ul class="text-xs text-navy-800 space-y-2 mb-6">
+                                <li><i class="fa-solid fa-circle-check text-gold-500 mr-2"></i> Feuchtigkeits- und UV-Schutz für Edelholz</li>
+                                <li><i class="fa-solid fa-circle-check text-gold-500 mr-2"></i> Kratzerfreie Display- & Glasreinigung</li>
+                                <li><i class="fa-solid fa-circle-check text-gold-500 mr-2"></i> Beseitigung hartnäckiger Kalkspuren</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- S3: Galley, Cabins & Carpets -->
+                    <div class="bg-navy-50 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition duration-300">
+                        <div class="h-48 overflow-hidden bg-navy-900 relative">
+                            <img src="https://images.unsplash.com/photo-1505242859-548c415b228c?auto=format&fit=crop&w=400&q=80" alt="Pantry und Teppichreinigung" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-navy-900 to-transparent"></div>
+                            <h3 class="absolute bottom-4 left-4 text-white font-serif text-xl font-bold">Pantry, Kabinen & Teppiche</h3>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-gray-600 text-sm mb-4 font-light">
+                                Gründliche Aufbereitung aller sanitären Anlagen (Nasszellen), der Pantry-Küche sowie Sprühextraktion aller schmutzigen Teppiche und Deckenverkleidungen.
+                            </p>
+                            <ul class="text-xs text-navy-800 space-y-2 mb-6">
+                                <li><i class="fa-solid fa-circle-check text-gold-500 mr-2"></i> Desinfektion & Geruchseliminierung</li>
+                                <li><i class="fa-solid fa-circle-check text-gold-500 mr-2"></i> Teppich-Sprühextraktion (Fleckenfrei)</li>
+                                <li><i class="fa-solid fa-circle-check text-gold-500 mr-2"></i> Ozonbehandlung gegen Modergerüche</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Explicit Disclaimer for Trust and Laser-Focus -->
+                <div class="mt-16 p-8 border-l-4 border-gold-500 bg-gold-100 rounded-r shadow-xs max-w-4xl mx-auto">
+                    <h4 class="font-serif font-bold text-lg text-navy-800 mb-2">Unser klarer Fokus: Nur exklusive Bootsinnenreinigung</h4>
+                    <p class="text-sm text-gray-700 leading-relaxed font-light">
+                        Bitte beachten Sie, dass weite Teile der Bootsaufbereitung Bodensee oft auf Motorarbeiten, Außen-Antifouling oder Werfttätigkeiten ausgerichtet sind. 
+                        <strong>Boat Detailing Bodensee bietet ganz bewusst keine Motor- oder Werftarbeiten an.</strong> 
+                        Wir konzentrieren unsere gesamte Expertise, Gerätschaften und Produkte ausschließlich auf die professionelle Innenreinigung von Booten und Yachten. Das schont Ihre wertvollen Materialien und sichert maximale Qualität.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="preise-page" data-page class="hidden bg-white py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <span class="text-gold-500 font-semibold tracking-widest uppercase text-xs">Transparente Konditionen</span>
+                    <h1 class="text-4xl font-serif font-bold text-navy-800 mt-2">Preise & Kalkulator</h1>
+                    <p class="text-gray-600 mt-4 font-light">
+                        Jede Yacht ist ein Unikat. Ermitteln Sie mit unserem interaktiven Preiskalkulator eine erste, unverbindliche Kostenschätzung für die Bootsaufbereitung Bodensee an Ihrem Liegeplatz.
+                    </p>
+                </div>
+
+                <!-- Interactive Pricing Calculator -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 bg-navy-50 p-8 sm:p-12 rounded-xl shadow-sm border border-gray-100 max-w-5xl mx-auto">
+                    <div class="space-y-6">
+                        <h3 class="text-2xl font-serif font-bold text-navy-800">1. Details Ihres Boots</h3>
+                        
+                        <!-- Boot length slider -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2 flex justify-between">
+                                <span>Länge des Boots (Meter):</span>
+                                <span class="font-bold text-gold-600" id="calc-len-display">8m</span>
+                            </label>
+                            <input type="range" min="5" max="25" value="8" id="calc-length" oninput="updateCalculator()" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-gold-500">
+                            <div class="flex justify-between text-xs text-gray-400 mt-1">
+                                <span>5m (Sportboot)</span>
+                                <span>25m+ (Luxusyacht)</span>
+                            </div>
+                        </div>
+
+                        <!-- Boot condition selector -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Verschmutzungsgrad:</label>
+                            <div class="grid grid-cols-3 gap-3">
+                                <button type="button" onclick="setCondition('light')" id="cond-light" class="cond-btn py-3 px-2 text-xs border rounded bg-white font-medium hover:border-gold-500 transition">Leicht gepflegt</button>
+                                <button type="button" onclick="setCondition('normal')" id="cond-normal" class="cond-btn py-3 px-2 border border-gold-500 bg-gold-100/30 text-gold-700 text-xs rounded font-bold transition">Normal verwittert</button>
+                                <button type="button" onclick="setCondition('heavy')" id="cond-heavy" class="cond-btn py-3 px-2 text-xs border rounded bg-white font-medium hover:border-gold-500 transition">Stark vernachlässigt</button>
+                            </div>
+                        </div>
+
+                        <!-- Additional premium options -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Zusatz-Veredelungen:</label>
+                            <div class="space-y-3">
+                                <label class="flex items-center gap-3 bg-white p-3 rounded border hover:border-gold-500 cursor-pointer">
+                                    <input type="checkbox" id="calc-wood" onchange="updateCalculator()" class="rounded text-gold-500 focus:ring-gold-500">
+                                    <span class="text-xs text-gray-700 font-medium">Edelholz-Pflege & Glanzversiegelung (+120€)</span>
+                                </label>
+                                <label class="flex items-center gap-3 bg-white p-3 rounded border hover:border-gold-500 cursor-pointer">
+                                    <input type="checkbox" id="calc-leather" onchange="updateCalculator()" class="rounded text-gold-500 focus:ring-gold-500">
+                                    <span class="text-xs text-gray-700 font-medium">Leder-Tiefenimprägnierung & Hydrophobierung (+180€)</span>
+                                </label>
+                                <label class="flex items-center gap-3 bg-white p-3 rounded border hover:border-gold-500 cursor-pointer">
+                                    <input type="checkbox" id="calc-carpet" onchange="updateCalculator()" class="rounded text-gold-500 focus:ring-gold-500">
+                                    <span class="text-xs text-gray-700 font-medium">Nass-Teppichreinigung Sprühextraktion (+150€)</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Result Box -->
+                    <div class="bg-navy-900 text-white p-8 rounded-lg flex flex-col justify-between border border-gold-500/30">
+                        <div>
+                            <span class="text-xs tracking-widest uppercase text-gold-500 font-semibold block mb-2">Ihre Kostenschätzung</span>
+                            <h4 class="font-serif text-xl mb-4">Mobiles Interior Detailing</h4>
+                            
+                            <!-- Display calculated price range -->
+                            <div class="py-6 border-y border-navy-800">
+                                <div class="text-sm text-gray-400">Geschätzter Aufwand:</div>
+                                <div class="text-4xl sm:text-5xl font-bold font-serif text-gold-500 mt-2" id="calc-price-display">ca. 480€ - 640€</div>
+                                <div class="text-[10px] text-gray-500 mt-2">*Exkl. MwSt. Endpreis richtet sich nach tatsächlicher Besichtigung. Inkl. kostenloser mobiler Anfahrt am Bodensee.</div>
+                            </div>
+
+                            <ul class="mt-6 space-y-2 text-xs text-gray-300">
+                                <li><i class="fa-solid fa-check text-gold-500 mr-2"></i> Inkl. All-Inklusive Anfahrt zum Liegeplatz</li>
+                                <li><i class="fa-solid fa-check text-gold-500 mr-2"></i> Professionelle Detailing-Maschinen & Reiniger</li>
+                                <li><i class="fa-solid fa-check text-gold-500 mr-2"></i> Abnahme durch geschultes Personal</li>
+                            </ul>
+                        </div>
+
+                        <div class="mt-8">
+                            <a href="#kontakt" onclick="navigate('kontakt')" class="w-full text-center block px-6 py-4 text-xs font-bold tracking-widest text-navy-900 bg-gold-500 hover:bg-gold-600 rounded uppercase transition">
+                                Dieses Angebot unverbindlich anfragen
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    function setCondition(cond) {
+                        state.calculator.condition = cond;
+                        document.querySelectorAll('.cond-btn').forEach(btn => {
+                            btn.className = 'cond-btn py-3 px-2 text-xs border rounded bg-white font-medium hover:border-gold-500 transition';
+                        });
+                        const activeBtn = document.getElementById('cond-' + cond);
+                        activeBtn.className = 'cond-btn py-3 px-2 border border-gold-500 bg-gold-100/30 text-gold-700 text-xs rounded font-bold transition';
+                        updateCalculator();
+                    }
+
+                    function updateCalculator() {
+                        const len = parseInt(document.getElementById('calc-length').value);
+                        document.getElementById('calc-len-display').innerText = len + 'm';
+                        
+                        let basePrice = len * 40; // Base price per meter
+                        
+                        // Condition modifier
+                        if (state.calculator.condition === 'light') {
+                            basePrice *= 0.8;
+                        } else if (state.calculator.condition === 'heavy') {
+                            basePrice *= 1.4;
+                        }
+
+                        // Add extras
+                        if (document.getElementById('calc-wood').checked) basePrice += 120;
+                        if (document.getElementById('calc-leather').checked) basePrice += 180;
+                        if (document.getElementById('calc-carpet').checked) basePrice += 150;
+
+                        const lowEstimate = Math.round(basePrice * 0.9);
+                        const highEstimate = Math.round(basePrice * 1.1);
+
+                        document.getElementById('calc-price-display').innerText = `ca. ${lowEstimate}€ - ${highEstimate}€`;
+                    }
+                </script>
+            </div>
+        </div>
+
+
+        <div id="standorte-page" data-page class="hidden bg-white py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <span class="text-gold-500 font-semibold tracking-widest uppercase text-xs">Lokale Präsenz</span>
+                    <h1 class="text-4xl font-serif font-bold text-navy-800 mt-2">Unsere Standorte am Bodensee</h1>
+                    <p class="text-gray-600 mt-4 font-light">
+                        Als mobiler Premium-Dienstleister für Bootsreinigung Bodensee bedienen wir alle wichtigen Häfen und Marinas direkt vor Ort am Liegeplatz. Wählen Sie Ihren Standort für maßgeschneiderte lokale Informationen.
+                    </p>
+                </div>
+
+                <!-- Custom Elegant SVG Map of Lake Constance (Bodensee) with interactive pins -->
+                <div class="relative max-w-3xl mx-auto mb-16 bg-navy-50 p-6 rounded-xl border border-gray-100 shadow-inner">
+                    <div class="text-center text-xs tracking-widest text-navy-900 uppercase font-bold mb-4">Interaktive Revierkarte</div>
+                    <svg viewBox="0 0 1000 400" class="w-full h-auto text-blue-900" style="filter: drop-shadow(0px 10px 15px rgba(11,27,61,0.15));">
+                        <!-- Simplified Lake Contour -->
+                        <path d="M 100,180 Q 250,150 400,220 T 700,200 T 900,180 Q 850,280 600,260 T 300,240 Z" fill="#0B1B3D" opacity="0.85" />
+                        <!-- Location Nodes -->
+                        <g class="cursor-pointer" onclick="navigate('standort', 'konstanz')">
+                            <circle cx="320" cy="220" r="10" fill="#D4AF37" class="animate-ping" />
+                            <circle cx="320" cy="220" r="6" fill="#D4AF37" />
+                            <text x="320" y="205" font-size="12" fill="#071127" font-weight="bold" text-anchor="middle">Konstanz</text>
+                        </g>
+                        <g class="cursor-pointer" onclick="navigate('standort', 'friedrichshafen')">
+                            <circle cx="680" cy="180" r="6" fill="#D4AF37" />
+                            <text x="680" y="165" font-size="12" fill="#071127" font-weight="bold" text-anchor="middle">Friedrichshafen</text>
+                        </g>
+                        <g class="cursor-pointer" onclick="navigate('standort', 'lindau')">
+                            <circle cx="860" cy="190" r="6" fill="#D4AF37" />
+                            <text x="860" y="175" font-size="12" fill="#071127" font-weight="bold" text-anchor="middle">Lindau</text>
+                        </g>
+                        <g class="cursor-pointer" onclick="navigate('standort', 'ueberlingen')">
+                            <circle cx="210" cy="140" r="6" fill="#D4AF37" />
+                            <text x="210" y="125" font-size="12" fill="#071127" font-weight="bold" text-anchor="middle">Überlingen</text>
+                        </g>
+                        <g class="cursor-pointer" onclick="navigate('standort', 'meersburg')">
+                            <circle cx="430" cy="170" r="6" fill="#D4AF37" />
+                            <text x="430" y="155" font-size="12" fill="#071127" font-weight="bold" text-anchor="middle">Meersburg</text>
+                        </g>
+                    </svg>
+                    <div class="text-center text-xs text-gray-500 mt-4">Klicken Sie auf einen Pin oder wählen Sie aus der Liste unten.</div>
+                </div>
+
+                <!-- 10 Unique SEO Locations Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                    <a href="#standort/friedrichshafen" class="group bg-navy-50 p-6 rounded hover:bg-navy-900 hover:text-white transition duration-300 border border-gray-100 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-serif font-bold text-lg text-navy-800 group-hover:text-gold-500">Friedrichshafen</h3>
+                            <p class="text-xs text-gray-500 group-hover:text-gray-300 mt-2 font-light">Einsatz an Schlossbucht & BSB Häfen.</p>
+                        </div>
+                        <span class="text-xs text-gold-600 font-bold tracking-widest uppercase mt-4 block">Ansehen &rarr;</span>
+                    </a>
+                    <a href="#standort/konstanz" class="group bg-navy-50 p-6 rounded hover:bg-navy-900 hover:text-white transition duration-300 border border-gray-100 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-serif font-bold text-lg text-navy-800 group-hover:text-gold-500">Konstanz</h3>
+                            <p class="text-xs text-gray-500 group-hover:text-gray-300 mt-2 font-light">Mobile Yachtpflege in Konstanz-Staand.</p>
+                        </div>
+                        <span class="text-xs text-gold-600 font-bold tracking-widest uppercase mt-4 block">Ansehen &rarr;</span>
+                    </a>
+                    <a href="#standort/ueberlingen" class="group bg-navy-50 p-6 rounded hover:bg-navy-900 hover:text-white transition duration-300 border border-gray-100 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-serif font-bold text-lg text-navy-800 group-hover:text-gold-500">Überlingen</h3>
+                            <p class="text-xs text-gray-500 group-hover:text-gray-300 mt-2 font-light">Fokus auf edle Kabinen im Osthafen.</p>
+                        </div>
+                        <span class="text-xs text-gold-600 font-bold tracking-widest uppercase mt-4 block">Ansehen &rarr;</span>
+                    </a>
+                    <a href="#standort/lindau" class="group bg-navy-50 p-6 rounded hover:bg-navy-900 hover:text-white transition duration-300 border border-gray-100 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-serif font-bold text-lg text-navy-800 group-hover:text-gold-500">Lindau</h3>
+                            <p class="text-xs text-gray-500 group-hover:text-gray-300 mt-2 font-light">Bayerischer Hafen & Insel-Liegeplätze.</p>
+                        </div>
+                        <span class="text-xs text-gold-600 font-bold tracking-widest uppercase mt-4 block">Ansehen &rarr;</span>
+                    </a>
+                    <a href="#standort/meersburg" class="group bg-navy-50 p-6 rounded hover:bg-navy-900 hover:text-white transition duration-300 border border-gray-100 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-serif font-bold text-lg text-navy-800 group-hover:text-gold-500">Meersburg</h3>
+                            <p class="text-xs text-gray-500 group-hover:text-gray-300 mt-2 font-light">Exquisite Pflege unterhalb der Burg.</p>
+                        </div>
+                        <span class="text-xs text-gold-600 font-bold tracking-widest uppercase mt-4 block">Ansehen &rarr;</span>
+                    </a>
+                    <a href="#standort/kressbronn" class="group bg-navy-50 p-6 rounded hover:bg-navy-900 hover:text-white transition duration-300 border border-gray-100 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-serif font-bold text-lg text-navy-800 group-hover:text-gold-500">Kressbronn</h3>
+                            <p class="text-xs text-gray-500 group-hover:text-gray-300 mt-2 font-light">Service in der großen Ultramarin-Marina.</p>
+                        </div>
+                        <span class="text-xs text-gold-600 font-bold tracking-widest uppercase mt-4 block">Ansehen &rarr;</span>
+                    </a>
+                    <a href="#standort/immenstaad" class="group bg-navy-50 p-6 rounded hover:bg-navy-900 hover:text-white transition duration-300 border border-gray-100 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-serif font-bold text-lg text-navy-800 group-hover:text-gold-500">Immenstaad</h3>
+                            <p class="text-xs text-gray-500 group-hover:text-gray-300 mt-2 font-light">Praktische Vor-Ort Pflege für Motorboote.</p>
+                        </div>
+                        <span class="text-xs text-gold-600 font-bold tracking-widest uppercase mt-4 block">Ansehen &rarr;</span>
+                    </a>
+                    <a href="#standort/langenargen" class="group bg-navy-50 p-6 rounded hover:bg-navy-900 hover:text-white transition duration-300 border border-gray-100 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-serif font-bold text-lg text-navy-800 group-hover:text-gold-500">Langenargen</h3>
+                            <p class="text-xs text-gray-500 group-hover:text-gray-300 mt-2 font-light">Spezial-Reinigung im BMK Yachting Hafen.</p>
+                        </div>
+                        <span class="text-xs text-gold-600 font-bold tracking-widest uppercase mt-4 block">Ansehen &rarr;</span>
+                    </a>
+                    <a href="#standort/romanshorn" class="group bg-navy-50 p-6 rounded hover:bg-navy-900 hover:text-white transition duration-300 border border-gray-100 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-serif font-bold text-lg text-navy-800 group-hover:text-gold-500">Romanshorn</h3>
+                            <p class="text-xs text-gray-500 group-hover:text-gray-300 mt-2 font-light">Schweizer Yacht-Expertise am Hafen.</p>
+                        </div>
+                        <span class="text-xs text-gold-600 font-bold tracking-widest uppercase mt-4 block">Ansehen &rarr;</span>
+                    </a>
+                    <a href="#standort/kreuzlingen" class="group bg-navy-50 p-6 rounded hover:bg-navy-900 hover:text-white transition duration-300 border border-gray-100 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-serif font-bold text-lg text-navy-800 group-hover:text-gold-500">Kreuzlingen</h3>
+                            <p class="text-xs text-gray-500 group-hover:text-gray-300 mt-2 font-light">Makelloser Innenraum-Service in der Schweiz.</p>
+                        </div>
+                        <span class="text-xs text-gold-600 font-bold tracking-widest uppercase mt-4 block">Ansehen &rarr;</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="standort-page" data-page class="hidden bg-white py-24">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <a href="#standorte" onclick="navigate('standorte')" class="inline-flex items-center gap-2 text-gold-600 hover:text-gold-700 font-semibold mb-8 text-sm">
+                    &larr; Zurück zur Standortübersicht
+                </a>
+                
+                <div class="bg-navy-50 rounded-xl p-8 sm:p-12 border border-gray-100 shadow-sm">
+                    <span class="text-gold-500 font-semibold tracking-widest uppercase text-xs">Lokales Detailing Center</span>
+                    <h1 class="text-4xl sm:text-5xl font-serif font-bold text-navy-800 mt-2" id="loc-title">Standort</h1>
+                    
+                    <div id="loc-content" class="mt-8 text-gray-600 space-y-6 font-light leading-relaxed">
+                        <!-- Dynamic Content Inject -->
+                    </div>
+
+                    <!-- Call to Action inside local page -->
+                    <div class="mt-12 pt-8 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-6">
+                        <div>
+                            <h4 class="font-serif font-bold text-lg text-navy-800">Sie liegen in dieser Region vor Anker?</h4>
+                            <p class="text-sm text-gray-500 font-light">Wir besuchen Sie direkt an Ihrem Liegeplatz.</p>
+                        </div>
+                        <a href="#kontakt" onclick="navigate('kontakt')" class="px-8 py-4 text-xs font-bold tracking-widest text-navy-900 uppercase bg-gold-500 hover:bg-gold-600 rounded whitespace-nowrap">
+                            Termin vereinbaren
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Localized SEO optimized descriptions to avoid duplicate content
+            const locationData = {
+                friedrichshafen: {
+                    title: "Boat Detailing Bodensee in Friedrichshafen",
+                    html: `
+                        <p>Herzlich willkommen bei Ihrem Experten für die <strong>Bootsaufbereitung Bodensee</strong> direkt in der Messestadt Friedrichshafen. Am geschäftigen Ufer und den traditionsreichen Yachthäfen rund um die Schlossbucht und die BSB-Werftanlagen bieten wir anspruchsvollen Eignern unsere exklusive <strong>Bootsreinigung Bodensee</strong> an.</p>
+                        <p>Das feuchte Bodensee-Klima setzt edlem Interieur wie feinem Marine-Leder und edlen Holzelementen zu. Unser mobiler Detailing-Service reinigt und imprägniert Ihre Innenräume direkt am Liegeplatz in Friedrichshafen. Wir arbeiten geräuschlos und professionell, sodass Sie sich um nichts kümmern müssen. Eine präzise <strong>Boot Innenreinigung Bodensee</strong> erhält nicht nur den Glanz Ihrer Yacht, sondern sichert auch deren langfristigen Wert.</p>
+                        <ul class="space-y-2 text-xs text-navy-800 font-medium">
+                            <li><i class="fa-solid fa-check text-gold-500 mr-2"></i> Perfekte Erreichbarkeit an allen Liegeplätzen in Friedrichshafen</li>
+                            <li><i class="fa-solid fa-check text-gold-500 mr-2"></i> Schutz vor feuchtigkeitsbedingtem Stockfleckenbefall in den Kabinen</li>
+                            <li><i class="fa-solid fa-check text-gold-500 mr-2"></i> Keine unnötigen Fahrten: Wir bringen das gesamte Premium-Equipment mit</li>
+                        </ul>
+                    `
+                },
+                konstanz: {
+                    title: "Exklusive Bootsreinigung Bodensee in Konstanz",
+                    html: `
+                        <p>Konstanz, als größte Stadt am See, beheimatet eine Vielzahl exklusiver Yachten und eleganter Daycruiser. Für anspruchsvolle Yachteigner in Konstanz-Staand oder den hiesigen Segelhäfen bieten wir ein maßgeschneidertes <strong>Boat Detailing Bodensee</strong> für Ihre edlen Innenräume.</p>
+                        <p>Unsere Expertise bei der exklusiven <strong>Yachtpflege Bodensee</strong> garantiert eine porentiefe Cockpit- und Polsterpflege. Wir entfernen Spuren von UV-Strahlung, Sonnenöl und See-Rückständen rückstandslos. Vertrauen Sie auf unseren professionellen, mobilen Reinigungsservice in Konstanz, der gänzlich ohne Chemie-Keulen, sondern mit biologisch abbaubaren Premium-Pflegemitteln arbeitet.</p>
+                    `
+                },
+                ueberlingen: {
+                    title: "Yachtpflege Bodensee in Überlingen",
+                    html: `
+                        <p>In Überlingen, berühmt für seine idyllische Uferpromenade und den erstklassigen Osthafen, finden Yachtbesitzer in uns den idealen Partner für anspruchsvolle Innenraumpflege. Wir haben uns vollkommen auf exklusive Materialien spezialisiert.</p>
+                        <p>Von der Pantry-Desinfektion über die Polstertiefenreinigung bis hin zur Hochglanz-Veredelung empfindlicher Carbon- und Holzelemente am Steuerstand führen wir alle Arbeiten hochpräzise aus. Verlassen Sie sich in Überlingen auf diskreten Service auf Porsche- und Riva-Niveau.</p>
+                    `
+                },
+                lindau: {
+                    title: "Luxuriöse Boot Innenreinigung Bodensee in Lindau",
+                    html: `
+                        <p>Der bayerische Hafen in Lindau mit seiner weltberühmten Hafeneinfahrt ist Heimat repräsentativer Holzboote und Luxusyachten. Mit unserer <strong>Bootsaufbereitung Bodensee</strong> sorgen wir dafür, dass Ihre Yacht dem majestätischen Panorama in nichts nachsteht.</p>
+                        <p>Gerade klassische Holzyachten erfordern feinfühlige Materialkenntnisse. Wir reinigen die feinen Teppichböden, frischen Polsterbezüge aus Alcantara auf und bringen matte Lackoberflächen im Cockpit wieder auf Hochglanz. Wir arbeiten direkt im Lindauer Segler-Club oder am Haupthafen.</p>
+                    `
+                },
+                meersburg: {
+                    title: "Bootsaufbereitung Bodensee in Meersburg",
+                    html: `
+                        <p>Vor der malerischen Kulisse der Meersburger Weinberge und der historischen Burg liegt der idyllische Hafen. Hier verhelfen wir Ihrem Boot zu makellosem Innenraum-Glanz.</p>
+                        <p>Vermeiden Sie feuchtes, muffiges Interieur durch unsere professionelle Ozon-Geruchseliminierung und Tiefensauger-Behandlung. Wir sind Ihr vertrauenswürdiger Partner in Meersburg für mobile, schnelle und tiefenwirksame Reinigung.</p>
+                    `
+                },
+                kressbronn: {
+                    title: "Premium Yachtpflege in Kressbronn (Ultramarin Marina)",
+                    html: `
+                        <p>Im größten Yachthafen des Bodensees – dem Ultramarin in Kressbronn-Gohren – sind wir regelmäßig im Einsatz. Hier betreuen wir sowohl kleine Sportboote als auch herrschaftliche Segel- und Motoryachten.</p>
+                        <p>Gerade nach langen Törns benötigt die Pantry und der Sanitärbereich eine intensive hygienische Desinfektion. Wir reinigen Ihre Polster, beseitigen Kalk und pflegen das sensible Leder, während Sie entspannt die Marina genießen.</p>
+                    `
+                },
+                immenstaad: {
+                    title: "Mobile Bootsreinigung in Immenstaad",
+                    html: `
+                        <p>Yachtbesitzer in Immenstaad schätzen die rasche Verfügbarkeit unseres mobilen Detailers. Wir reisen direkt mit voll ausgestattetem Servicefahrzeug an Ihren Liegeplatz.</p>
+                        <p>Ob Fleckenentfernung auf Teppichen, Cockpit-Entstaubung oder Scheibenreinigung – wir sorgen in Immenstaad für einen glänzenden Auftritt Ihrer Yacht auf dem Wasser.</p>
+                    `
+                },
+                langenargen: {
+                    title: "Boat Detailing im BMK Yachtfafen Langenargen",
+                    html: `
+                        <p>Der BMK Hafen in Langenargen ist bekannt für seine erstklassige Infrastruktur. Unser exklusiver mobiler Innenreinigungsservice fügt sich perfekt in dieses anspruchsvolle Umfeld ein.</p>
+                        <p>Wir veredeln die Cockpits luxuriöser Motoryachten und reinigen die Kajüten von Segelbooten. Erleben Sie faszinierende Sauberkeit und feinen Duft nach edler Lederpflege direkt in Langenargen.</p>
+                    `
+                },
+                romanshorn: {
+                    title: "Premium Bootsreinigung am Schweizer Ufer: Romanshorn",
+                    html: `
+                        <p>Auch auf der Schweizer Seite des Bodensees sind wir für Sie im Einsatz. Romanshorn verfügt über einen der schönsten und größten Häfen der Region.</p>
+                        <p>Wir bringen Schweizer Präzision und unsere erstklassigen Detailing-Standards direkt an Ihren Steg. Genießen Sie den exklusiven Duft von frisch aufbereitetem Leder und glasklaren Cockpit-Armaturen.</p>
+                    `
+                },
+                kreuzlingen: {
+                    title: "Exklusive Boot Innenreinigung in Kreuzlingen",
+                    html: `
+                        <p>Direkt angrenzend an Konstanz, versorgen wir im Schweizer Kreuzlingen anspruchsvolle Yachtbesitzer mit erstklassigem Innenraum-Detailing.</p>
+                        <p>Wir arbeiten nach strengen Qualitätsmaßstäben, um empfindliche Materialoberflächen dauerhaft zu erhalten und Schmutz rückstandslos zu eliminieren. Gönnen Sie Ihrem Boot eine Wellnesskur am Hafen Kreuzlingen.</p>
+                    `
+                }
+            };
+
+            function renderLocationPage(locationId) {
+                const data = locationData[locationId];
+                if (!data) {
+                    navigate('standorte');
+                    return;
+                }
+                document.getElementById('loc-title').innerHTML = data.title;
+                document.getElementById('loc-content').innerHTML = data.html;
+            }
+        </script>
+
+
+        <div id="faq-page" data-page class="hidden bg-white py-24">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <span class="text-gold-500 font-semibold tracking-widest uppercase text-xs">Fragen & Antworten</span>
+                    <h1 class="text-4xl font-serif font-bold text-navy-800 mt-2">Häufig gestellte Fragen (FAQ)</h1>
+                    <p class="text-gray-600 mt-4 font-light">
+                        Alles Wissenswerte über unsere exklusive Bootsaufbereitung Bodensee an Ihrem Liegeplatz.
+                    </p>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Q1 -->
+                    <div class="border border-gray-200 rounded">
+                        <button type="button" onclick="toggleFaq(1)" class="w-full text-left p-6 font-bold text-navy-800 flex justify-between items-center hover:bg-navy-50 transition">
+                            <span>Bieten Sie auch Polierarbeiten am Rumpf oder Motorwartung an?</span>
+                            <i class="fa-solid fa-chevron-down transition duration-200 text-gold-500" id="faq-icon-1"></i>
+                        </button>
+                        <div class="hidden p-6 border-t border-gray-200 text-gray-600 text-sm font-light space-y-2" id="faq-ans-1">
+                            <p><strong>Nein.</strong> Wir haben uns ganz bewusst ausschließlich auf die exklusive Innenraumaufbereitung (Interior Detailing) spezialisiert. Es werden keinerlei Motorarbeiten, Unterwasseranstriche (Antifouling) oder mechanische Reparaturen durchgeführt.</p>
+                            <p>Durch diesen exklusiven Fokus garantieren wir absolute Perfektion bei der Pflege empfindlicher Interieurs wie Alcantara, Marine-Leder, Teppichen und anspruchsvollem Edelholz.</p>
+                        </div>
+                    </div>
+
+                    <!-- Q2 -->
+                    <div class="border border-gray-200 rounded">
+                        <button type="button" onclick="toggleFaq(2)" class="w-full text-left p-6 font-bold text-navy-800 flex justify-between items-center hover:bg-navy-50 transition">
+                            <span>Muss ich mein Boot für die Reinigung zu Ihnen bringen?</span>
+                            <i class="fa-solid fa-chevron-down transition duration-200 text-gold-500" id="faq-icon-2"></i>
+                        </button>
+                        <div class="hidden p-6 border-t border-gray-200 text-gray-600 text-sm font-light" id="faq-ans-2">
+                            <p>Nein, das ist das Besondere an unserem Service: Wir arbeiten <strong>vollkommen mobil</strong> direkt an Ihrem Liegeplatz oder Winterlager rund um den Bodensee. Wir bringen alle benötigten, High-End Detailing-Produkte und professionellen Werkzeuge direkt mit an den Steg.</p>
+                        </div>
+                    </div>
+
+                    <!-- Q3 -->
+                    <div class="border border-gray-200 rounded">
+                        <button type="button" onclick="toggleFaq(3)" class="w-full text-left p-6 font-bold text-navy-800 flex justify-between items-center hover:bg-navy-50 transition">
+                            <span>Welche Häfen am Bodensee fahren Sie an?</span>
+                            <i class="fa-solid fa-chevron-down transition duration-200 text-gold-500" id="faq-icon-3"></i>
+                        </button>
+                        <div class="hidden p-6 border-t border-gray-200 text-gray-600 text-sm font-light" id="faq-ans-3">
+                            <p>Wir bedienen alle wichtigen Marinas und privaten Liegeplätze am gesamten Bodensee – sowohl in Deutschland (Friedrichshafen, Konstanz, Lindau, Überlingen etc.) als auch in der Schweiz (Romanshorn, Kreuzlingen). Unsere mobile Anfahrt ist in den unverbindlichen Festpreis-Schätzungen bereits enthalten.</p>
+                        </div>
+                    </div>
+
+                    <!-- Q4 -->
+                    <div class="border border-gray-200 rounded">
+                        <button type="button" onclick="toggleFaq(4)" class="w-full text-left p-6 font-bold text-navy-800 flex justify-between items-center hover:bg-navy-50 transition">
+                            <span>Sind Ihre Reinigungsmittel materialschonend und biologisch abbaubar?</span>
+                            <i class="fa-solid fa-chevron-down transition duration-200 text-gold-500" id="faq-icon-4"></i>
+                        </button>
+                        <div class="hidden p-6 border-t border-gray-200 text-gray-600 text-sm font-light" id="faq-ans-4">
+                            <p>Ja, absolut. Zum Schutz unseres kostbaren Ökosystems Bodensee verwenden wir ausschließlich pH-neutrale, biologisch abbaubare Spezialreiniger der Luxusklasse. Diese sind absolut materialschonend für die anspruchsvollen Bootsmaterialien und unbedenklich für Mensch, Tier und Natur.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function toggleFaq(id) {
+                const ans = document.getElementById('faq-ans-' + id);
+                const icon = document.getElementById('faq-icon-' + id);
+                if (ans.classList.contains('hidden')) {
+                    ans.classList.remove('hidden');
+                    icon.classList.add('rotate-180');
+                } else {
+                    ans.classList.add('hidden');
+                    icon.classList.remove('rotate-180');
+                }
+            }
+        </script>
+
+
+        <div id="blog-page" data-page class="hidden bg-white py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <span class="text-gold-500 font-semibold tracking-widest uppercase text-xs">Yachting Journal</span>
+                    <h1 class="text-4xl font-serif font-bold text-navy-800 mt-2">Pflegetipps & Branchen-Insights</h1>
+                    <p class="text-gray-600 mt-4 font-light">
+                        Erfahren Sie, wie Sie den Wert und Glanz Ihrer Yacht auf dem Bodensee dauerhaft erhalten.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Article 1 -->
+                    <div class="bg-navy-50 rounded-lg overflow-hidden border border-gray-100 flex flex-col justify-between">
+                        <img src="https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&w=400&q=80" alt="Lederpflege Yacht" class="h-48 w-full object-cover">
+                        <div class="p-6 flex-grow flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs text-gold-600 font-semibold uppercase">Pflege-Guide</span>
+                                <h3 class="font-serif font-bold text-lg text-navy-800 mt-2">Lederpflege auf Booten: So verhindern Sie Risse und Salzflecken</h3>
+                                <p class="text-gray-500 text-xs mt-3 font-light">
+                                    Die Kombination aus intensiver UV-Strahlung auf dem Bodensee und salzhaltigem Schweiß zerstört herkömmliches Marine-Leder rasch. Wir zeigen, wie Sie mit pH-neutralen Reinigern und Tiefenschutz vorbeugen...
+                                </p>
+                            </div>
+                            <a href="#kontakt" onclick="navigate('kontakt')" class="text-gold-600 hover:text-gold-700 font-semibold text-xs uppercase tracking-widest mt-6 block">Termin zur Lederkur anfragen &rarr;</a>
+                        </div>
+                    </div>
+
+                    <!-- Article 2 -->
+                    <div class="bg-navy-50 rounded-lg overflow-hidden border border-gray-100 flex flex-col justify-between">
+                        <img src="https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?auto=format&fit=crop&w=400&q=80" alt="Wertsteigerung Yacht" class="h-48 w-full object-cover">
+                        <div class="p-6 flex-grow flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs text-gold-600 font-semibold uppercase">Wertsteigerung</span>
+                                <h3 class="font-serif font-bold text-lg text-navy-800 mt-2">Warum eine regelmäßige Bootsaufbereitung Bodensee den Wiederverkaufswert sichert</h3>
+                                <p class="text-gray-500 text-xs mt-3 font-light">
+                                    Käufer einer gebrauchten Yacht achten penibel auf den Zustand der Kabine und des Cockpits. Unangenehme Gerüche oder vergilbtes GFK drücken den Preis massiv. Erfahren Sie, wie professionelles Detailing wirkt...
+                                </p>
+                            </div>
+                            <a href="#kontakt" onclick="navigate('kontakt')" class="text-gold-600 hover:text-gold-700 font-semibold text-xs uppercase tracking-widest mt-6 block">Werterhalt anfragen &rarr;</a>
+                        </div>
+                    </div>
+
+                    <!-- Article 3 -->
+                    <div class="bg-navy-50 rounded-lg overflow-hidden border border-gray-100 flex flex-col justify-between">
+                        <img src="https://images.unsplash.com/photo-1505242859-548c415b228c?auto=format&fit=crop&w=400&q=80" alt="Schimmelpilz vermeiden" class="h-48 w-full object-cover">
+                        <div class="p-6 flex-grow flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs text-gold-600 font-semibold uppercase">Sicherheit & Hygiene</span>
+                                <h3 class="font-serif font-bold text-lg text-navy-800 mt-2">Modergerüche und Schimmel in Yacht-Kabinen wirksam bekämpfen</h3>
+                                <p class="text-gray-500 text-xs mt-3 font-light">
+                                    Muffige Gerüche nach der Winterpause sind keine Seltenheit. Mit professioneller Dampf-Desinfektion und einer gezielten Ozonbehandlung beseitigen wir Pilze und Bakterien dauerhaft...
+                                </p>
+                            </div>
+                            <a href="#kontakt" onclick="navigate('kontakt')" class="text-gold-600 hover:text-gold-700 font-semibold text-xs uppercase tracking-widest mt-6 block">Desinfektion anfragen &rarr;</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="ueber-uns-page" data-page class="hidden bg-white py-24">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <span class="text-gold-500 font-semibold tracking-widest uppercase text-xs">Wer wir sind</span>
+                <h1 class="text-4xl font-serif font-bold text-navy-800 mt-2">Leidenschaft für Perfektion</h1>
+                
+                <div class="mt-8 text-gray-600 space-y-6 font-light text-left max-w-2xl mx-auto">
+                    <p>
+                        Gegründet aus der reinen Faszination für exzellente Boote und Yachten, steht <strong>Boat Detailing Bodensee</strong> für makellose Reinheit und exklusive Pflege. Wir verstehen, dass ein Boot weit mehr ist als nur ein Transportmittel auf dem Wasser – es ist ein Ort des Rückzugs, der puren Erholung und des puren Luxus.
+                    </p>
+                    <p>
+                        Genau deshalb arbeiten wir mit derselben Sorgfalt und Hingabe, mit der die edelsten Riva-Yachten gebaut werden. Jede Naht im Leder, jede Fuge im Teak und jede Oberfläche im Cockpit wird von uns mit äußerster Präzision behandelt. 
+                    </p>
+                    <p>
+                        Als rein mobiles Team kommen wir direkt zu Ihnen. Unkompliziert, professionell und ohne die Notwendigkeit, Ihr Schiff mühsam in eine Werft zu überführen.
+                    </p>
+                </div>
+
+                <div class="mt-12">
+                    <img src="https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?auto=format&fit=crop&w=800&q=80" alt="Yacht Detail Arbeit" class="rounded-xl shadow-lg max-w-2xl mx-auto">
+                </div>
+            </div>
+        </div>
+
+
+        <div id="kontakt-page" data-page class="hidden bg-white py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <span class="text-gold-500 font-semibold tracking-widest uppercase text-xs">Anfrage senden</span>
+                    <h1 class="text-4xl font-serif font-bold text-navy-800 mt-2">Jetzt unverbindlichen Termin anfragen</h1>
+                    <p class="text-gray-600 mt-4 font-light">
+                        Teilen Sie uns Ihre Wünsche mit. Wir melden uns umgehend mit einem maßgeschneiderten Angebot für die exklusive Innenreinigung Ihrer Yacht am Bodensee.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-5xl mx-auto">
+                    <!-- Interactive form using local state -->
+                    <div class="bg-navy-50 p-8 rounded-xl border border-gray-100 shadow-sm">
+                        <form id="contact-form" onsubmit="handleFormSubmit(event)" class="space-y-6">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">Ihr Name *</label>
+                                    <input type="text" required class="w-full p-3 rounded border border-gray-300 focus:outline-none focus:border-gold-500 bg-white">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">Telefonnummer *</label>
+                                    <input type="tel" required class="w-full p-3 rounded border border-gray-300 focus:outline-none focus:border-gold-500 bg-white">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">E-Mail-Adresse *</label>
+                                <input type="email" required class="w-full p-3 rounded border border-gray-300 focus:outline-none focus:border-gold-500 bg-white">
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">Hafen / Liegeplatz *</label>
+                                    <select required class="w-full p-3 rounded border border-gray-300 focus:outline-none focus:border-gold-500 bg-white">
+                                        <option value="">Bitte wählen...</option>
+                                        <option value="Friedrichshafen">Friedrichshafen</option>
+                                        <option value="Konstanz">Konstanz</option>
+                                        <option value="Überlingen">Überlingen</option>
+                                        <option value="Lindau">Lindau</option>
+                                        <option value="Meersburg">Meersburg</option>
+                                        <option value="Kressbronn">Kressbronn</option>
+                                        <option value="Immenstaad">Immenstaad</option>
+                                        <option value="Langenargen">Langenargen</option>
+                                        <option value="Romanshorn">Romanshorn</option>
+                                        <option value="Kreuzlingen">Kreuzlingen</option>
+                                        <option value="Anderer Ort">Anderer Liegeplatz...</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">Bootstyp / Länge (m)</label>
+                                    <input type="text" placeholder="z.B. Bavaria 37 Cruiser / 11m" class="w-full p-3 rounded border border-gray-300 focus:outline-none focus:border-gold-500 bg-white">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">Ihre Nachricht / Wunschpaket</label>
+                                <textarea rows="4" class="w-full p-3 rounded border border-gray-300 focus:outline-none focus:border-gold-500 bg-white" placeholder="Beschreiben Sie kurz den Zustand Ihrer Yacht und welche Bereiche gereinigt werden sollen..."></textarea>
+                            </div>
+
+                            <button type="submit" class="w-full py-4 text-xs font-bold tracking-widest text-navy-900 uppercase bg-gold-500 hover:bg-gold-600 rounded transition duration-200">
+                                Unverbindliche Anfrage absenden
+                            </button>
+                        </form>
+
+                        <!-- Success message box -->
+                        <div id="success-box" class="hidden mt-6 p-6 bg-emerald-100 text-emerald-800 rounded border border-emerald-200">
+                            <h4 class="font-serif font-bold text-lg mb-1">Anfrage erfolgreich übermittelt!</h4>
+                            <p class="text-sm font-light">Vielen Dank für Ihre Anfrage. Ein Boot-Detailing Experte wird sich in Kürze telefonisch oder per E-Mail bei Ihnen melden.</p>
+                        </div>
+                    </div>
+
+                    <!-- Contact Details / Info Block -->
+                    <div class="space-y-8 flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-2xl font-serif font-bold text-navy-800">Direkter Kontakt</h3>
+                            <p class="text-gray-500 mt-2 font-light">
+                                Haben Sie eilige Fragen oder wünschen Sie eine sofortige telefonische Beratung? Rufen Sie uns direkt an oder schreiben Sie uns unkompliziert per WhatsApp.
+                            </p>
+                        </div>
+
+                        <div class="space-y-4">
+                            <!-- Phone -->
+                            <a href="tel:+4917612345678" class="flex items-center gap-4 p-4 rounded bg-navy-50 hover:bg-gold-100/30 border border-gray-100 transition group">
+                                <div class="w-12 h-12 rounded bg-navy-800 flex items-center justify-center text-gold-500">
+                                    <i class="fa-solid fa-phone text-lg"></i>
+                                </div>
+                                <div>
+                                    <span class="block text-xs text-gray-400">Telefonische Sofortberatung</span>
+                                    <span class="block font-bold text-navy-800 group-hover:text-gold-600 transition">+49 (0) 176 1234 5678</span>
+                                </div>
+                            </a>
+
+                            <!-- WhatsApp -->
+                            <a href="https://wa.me/4917612345678" target="_blank" class="flex items-center gap-4 p-4 rounded bg-emerald-50 hover:bg-emerald-100/50 border border-emerald-100 transition group">
+                                <div class="w-12 h-12 rounded bg-emerald-600 flex items-center justify-center text-white">
+                                    <i class="fa-brands fa-whatsapp text-xl"></i>
+                                </div>
+                                <div>
+                                    <span class="block text-xs text-emerald-600">WhatsApp Direkt-Chat</span>
+                                    <span class="block font-bold text-emerald-800 group-hover:text-emerald-900 transition">Jetzt Chat starten</span>
+                                </div>
+                            </a>
+                        </div>
+
+                        <!-- Styled Premium Map Representation of Lake Constance -->
+                        <div class="border border-gray-100 rounded-xl overflow-hidden p-6 bg-navy-900 text-white relative">
+                            <span class="text-xs text-gold-500 font-semibold uppercase tracking-widest">Einsatzgebiet</span>
+                            <h4 class="font-serif text-lg mt-1 mb-3">Gesamter Bodensee mobil</h4>
+                            <p class="text-xs text-gray-400 font-light leading-relaxed">
+                                Unser exklusiver Vor-Ort-Service gilt für alle Marinas, Segelvereine und private Bootsstege rund um den Bodensee. Wir reisen autonom mit eigener Ausrüstung an.
+                            </p>
+                            <div class="mt-4 flex gap-2">
+                                <span class="bg-navy-800 text-[10px] text-gray-300 px-2 py-1 rounded">DEUTSCHLAND</span>
+                                <span class="bg-navy-800 text-[10px] text-gray-300 px-2 py-1 rounded">SCHWEIZ</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function handleFormSubmit(event) {
+                event.preventDefault();
+                // Simulating modern submission flow
+                document.getElementById('contact-form').classList.add('hidden');
+                document.getElementById('success-box').classList.remove('hidden');
+            }
+        </script>
+
+        <!-- IMPRESSUM PAGE -->
+        <div id="impressum-page" data-page class="hidden bg-white py-24">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <span class="text-gold-500 font-semibold tracking-widest uppercase text-xs">Rechtliche Angaben</span>
+                <h1 class="text-4xl font-serif font-bold text-navy-800 mt-2 mb-8">Impressum</h1>
+                
+                <div class="prose prose-navy max-w-none text-gray-600 space-y-6 font-light leading-relaxed">
+                    <h3 class="font-serif font-bold text-xl text-navy-800">Angaben gemäß § 5 TMG</h3>
+                    <p>
+                        <strong>Boat Detailing Bodensee</strong><br>
+                        Maximilian Segler<br>
+                        Hafenstraße 12<br>
+                        88045 Friedrichshafen<br>
+                        Deutschland
+                    </p>
+
+                    <h3 class="font-serif font-bold text-xl text-navy-800">Kontakt</h3>
+                    <p>
+                        Telefon: +49 (0) 176 1234 5678<br>
+                        E-Mail: info@boat-detailing-bodensee.de<br>
+                        Web: www.boat-detailing-bodensee.de
+                    </p>
+
+                    <h3 class="font-serif font-bold text-xl text-navy-800">Umsatzsteuer-ID</h3>
+                    <p>
+                        Umsatzsteuer-Identifikationsnummer gemäß § 27 a Umsatzsteuergesetz:<br>
+                        DE 123 456 789
+                    </p>
+
+                    <h3 class="font-serif font-bold text-xl text-navy-800">Berufshaftpflichtversicherung</h3>
+                    <p>
+                        Name und Sitz des Versicherers:<br>
+                        Marina Secure AG<br>
+                        Uferpromenade 20, 88131 Lindau<br>
+                        Geltungsbereich: Gesamter Bodenseeraum (Deutschland, Österreich, Schweiz) für mobile Innenraumreinigungen auf Booten und Yachten direkt am Liegeplatz.
+                    </p>
+
+                    <h3 class="font-serif font-bold text-xl text-navy-800">Streitschlichtung</h3>
+                    <p class="text-sm">
+                        Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit: <a href="https://ec.europa.eu/consumers/odr/" target="_blank" class="text-gold-600 hover:underline">https://ec.europa.eu/consumers/odr/</a>.<br>
+                        Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- DATENSCHUTZ PAGE -->
+        <div id="datenschutz-page" data-page class="hidden bg-white py-24">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <span class="text-gold-500 font-semibold tracking-widest uppercase text-xs">Informationspflicht</span>
+                <h1 class="text-4xl font-serif font-bold text-navy-800 mt-2 mb-8">Datenschutzerklärung</h1>
+                
+                <div class="prose prose-navy max-w-none text-gray-600 space-y-6 font-light leading-relaxed text-sm">
+                    <h3 class="font-serif font-bold text-xl text-navy-800">1. Datenschutz auf einen Blick</h3>
+                    <h4 class="font-bold text-navy-800 mt-4">Allgemeine Hinweise</h4>
+                    <p>Die folgenden Hinweise geben einen einfachen Überblick darüber, was mit Ihren personenbezogenen Daten passiert, wenn Sie diese Website besuchen. Personenbezogene Daten sind alle Daten, mit denen Sie persönlich identifiziert werden können.</p>
+
+                    <h4 class="font-bold text-navy-800 mt-4">Datenerfassung auf dieser Website</h4>
+                    <p>Die Datenverarbeitung auf dieser Website erfolgt durch den Websitebetreiber. Dessen Kontaktdaten können Sie dem Impressum dieser Website entnehmen. Ihre Daten werden zum einen dadurch erhoben, dass Sie uns diese mitteilen. Hierbei kann es sich z. B. um Daten handeln, die Sie in unser Kontaktformular oder den Preiskalkulator eingeben.</p>
+
+                    <h3 class="font-serif font-bold text-xl text-navy-800 mt-8">2. Allgemeine Hinweise und Pflichtinformationen</h3>
+                    <h4 class="font-bold text-navy-800 mt-4">Widerruf Ihrer Einwilligung zur Datenverarbeitung</h4>
+                    <p>Viele Datenverarbeitungsvorgänge sind nur mit Ihrer ausdrücklichen Einwilligung möglich. Sie können eine bereits erteilte Einwilligung jederzeit widerrufen. Dazu reicht eine formlose Mitteilung per E-Mail an uns. Die Rechtmäßigkeit der bis zum Widerruf erfolgten Datenverarbeitung bleibt vom Widerruf unberührt.</p>
+                    
+                    <h4 class="font-bold text-navy-800 mt-4">Recht auf Auskunft, Löschung und Berichtigung</h4>
+                    <p>Sie haben im Rahmen der geltenden gesetzlichen Bestimmungen jederzeit das Recht auf unentgeltliche Auskunft über Ihre gespeicherten personenbezogenen Daten, deren Herkunft und Empfänger und den Zweck der Datenverarbeitung und ggf. ein Recht auf Berichtigung oder Löschung dieser Daten.</p>
+
+                    <h3 class="font-serif font-bold text-xl text-navy-800 mt-8">3. Datenerfassung auf dieser Website</h3>
+                    <h4 class="font-bold text-navy-800 mt-4">Kontaktformular / WhatsApp-Interaktion</h4>
+                    <p>Wenn Sie uns per Kontaktformular oder über die bereitgestellten WhatsApp-Schnittstellen Anfragen zukommen lassen, werden Ihre Angaben aus dem Anfrageformular inklusive der von Ihnen dort angegebenen Kontaktdaten zwecks Bearbeitung der Anfrage und für den Fall von Anschlussfragen bei uns gespeichert. Diese Daten geben wir nicht ohne Ihre Einwilligung weiter.</p>
+                    <p>Die Verarbeitung dieser Daten erfolgt auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO, sofern Ihre Anfrage mit der Erfüllung eines Vertrags zusammenhängt oder zur Durchführung vorvertraglicher Maßnahmen erforderlich ist.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- HAFTUNGSBESCHRAENKUNG PAGE -->
+        <div id="haftungsbeschraenkung-page" data-page class="hidden bg-white py-24">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <span class="text-gold-500 font-semibold tracking-widest uppercase text-xs">Rechtliche Vorbehalte</span>
+                <h1 class="text-4xl font-serif font-bold text-navy-800 mt-2 mb-8">Haftungsbeschränkung (Disclaimer)</h1>
+                
+                <div class="prose prose-navy max-w-none text-gray-600 space-y-6 font-light leading-relaxed">
+                    <h3 class="font-serif font-bold text-xl text-navy-800">Haftung für Inhalte</h3>
+                    <p class="text-sm">
+                        Als Diensteanbieter sind wir gemäß § 7 Abs.1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG sind wir als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen. Verpflichtungen zur Entfernung oder Sperrung der Nutzung von Informationen nach den allgemeinen Gesetzen bleiben hiervon unberührt. Eine diesbezügliche Haftung ist jedoch erst ab dem Zeitpunkt der Kenntnis einer konkreten Rechtsverletzung möglich. Bei Bekanntwerden von entsprechenden Rechtsverletzungen werden wir diese Inhalte umgehend entfernen.
+                    </p>
+
+                    <h3 class="font-serif font-bold text-xl text-navy-800">Haftung für Links</h3>
+                    <p class="text-sm">
+                        Unser Angebot enthält Links zu externen Websites Dritter, auf deren Inhalte wir keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich. Die verlinkten Seiten wurden zum Zeitpunkt der Verlinkung auf mögliche Rechtsverstöße überprüft. Rechtswidrige Inhalte waren zum Zeitpunkt der Verlinkung nicht erkennbar. Eine permanente inhaltliche Kontrolle der verlinkten Seiten ist jedoch ohne konkrete Anhaltspunkte einer Rechtsverletzung nicht zumutbar. Bei Bekanntwerden von Rechtsverletzungen werden wir derartige Links umgehend entfernen.
+                    </p>
+
+                    <h3 class="font-serif font-bold text-xl text-navy-800">Urheberrecht</h3>
+                    <p class="text-sm">
+                        Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers. Downloads und Kopien dieser Seite sind nur für den privaten, nicht kommerziellen Gebrauch gestattet. Soweit die Inhalte auf dieser Seite nicht vom Betreiber erstellt wurden, werden die Urheberrechte Dritter beachtet. Sollten Sie trotzdem auf eine Urheberrechtsverletzung aufmerksam werden, bitten wir um einen entsprechenden Hinweis. Bei Bekanntwerden von Rechtsverletzungen werden wir derartige Inhalte umgehend entfernen.
+                    </p>
+
+                    <h3 class="font-serif font-bold text-xl text-navy-800">Besonderer Hinweis für die mobile Bootspflege</h3>
+                    <p class="text-sm italic">
+                        Wir weisen ausdrücklich darauf hin, dass wir ausschließlich Reinigungs- und Veredelungsleistungen (Kosmetik) am Liegeplatz ausführen. Wir übernehmen keine Haftung für Schäden, die auf mechanischen Vorschäden des Schiffes, porösem Alt-Leder oder unzureichend versiegelten Elektronikkomponenten des Eigners beruhen, sofern uns diese nicht vor Arbeitsbeginn schriftlich angezeigt wurden.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-navy-900 text-white pt-16 pb-8 border-t border-navy-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <!-- Branding column -->
+                <div class="space-y-4">
+                    <a href="#home" onclick="navigate('home')" class="flex items-center space-x-3 group">
+                        <div class="relative flex items-center justify-center w-10 h-10 rounded-full border border-gold-500 overflow-hidden bg-navy-800">
+                            <span class="text-gold-500 font-serif font-bold text-lg tracking-wider">B</span>
+                        </div>
+                        <div>
+                            <span class="block text-base font-serif font-bold tracking-widest text-white">BOAT DETAILING</span>
+                            <span class="block text-[10px] font-sans tracking-widest text-gold-500 uppercase">Bodensee</span>
+                        </div>
+                    </a>
+                    <p class="text-xs text-gray-400 leading-relaxed font-light">
+                        Premium mobile Innenraumaufbereitung und exklusive Yachtpflege direkt am Liegeplatz rund um den Bodensee. Keine Werft- oder Motorarbeiten.
+                    </p>
+                </div>
+
+                <!-- Fast Links -->
+                <div>
+                    <h4 class="font-serif text-gold-500 font-bold text-sm tracking-widest uppercase mb-4">Navigation</h4>
+                    <ul class="space-y-2 text-xs text-gray-400 font-light">
+                        <li><a href="#home" onclick="navigate('home')" class="hover:text-gold-500 transition">Startseite</a></li>
+                        <li><a href="#leistungen" onclick="navigate('leistungen')" class="hover:text-gold-500 transition">Premium Leistungen</a></li>
+                        <li><a href="#preise" onclick="navigate('preise')" class="hover:text-gold-500 transition">Preise & Kalkulator</a></li>
+                        <li><a href="#standorte" onclick="navigate('standorte')" class="hover:text-gold-500 transition">Standorte</a></li>
+                        <li><a href="#faq" onclick="navigate('faq')" class="hover:text-gold-500 transition">FAQ</a></li>
+                        <li><a href="#blog" onclick="navigate('blog')" class="hover:text-gold-500 transition">Yachting Blog</a></li>
+                    </ul>
+                </div>
+
+                <!-- Unique SEO Locations footer navigation links to avoid duplicate content -->
+                <div>
+                    <h4 class="font-serif text-gold-500 font-bold text-sm tracking-widest uppercase mb-4">Häfen & Orte</h4>
+                    <ul class="grid grid-cols-2 gap-2 text-[10px] text-gray-400 font-light">
+                        <li><a href="#standort/friedrichshafen" class="hover:text-gold-500 transition">Friedrichshafen</a></li>
+                        <li><a href="#standort/konstanz" class="hover:text-gold-500 transition">Konstanz</a></li>
+                        <li><a href="#standort/ueberlingen" class="hover:text-gold-500 transition">Überlingen</a></li>
+                        <li><a href="#standort/lindau" class="hover:text-gold-500 transition">Lindau</a></li>
+                        <li><a href="#standort/meersburg" class="hover:text-gold-500 transition">Meersburg</a></li>
+                        <li><a href="#standort/kressbronn" class="hover:text-gold-500 transition">Kressbronn</a></li>
+                        <li><a href="#standort/immenstaad" class="hover:text-gold-500 transition">Immenstaad</a></li>
+                        <li><a href="#standort/langenargen" class="hover:text-gold-500 transition">Langenargen</a></li>
+                        <li><a href="#standort/romanshorn" class="hover:text-gold-500 transition">Romanshorn (CH)</a></li>
+                        <li><a href="#standort/kreuzlingen" class="hover:text-gold-500 transition">Kreuzlingen (CH)</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Direct info -->
+                <div>
+                    <h4 class="font-serif text-gold-500 font-bold text-sm tracking-widest uppercase mb-4">Kontakt</h4>
+                    <p class="text-xs text-gray-400 font-light mb-4">
+                        Boat Detailing Bodensee<br>
+                        88045 Friedrichshafen<br>
+                        Bodenseeregion mobil
+                    </p>
+                    <div class="space-y-1 text-xs font-bold text-gold-500">
+                        <a href="tel:+4917612345678" class="block hover:underline">+49 (0) 176 1234 5678</a>
+                        <a href="mailto:info@boat-detailing-bodensee.de" class="block hover:underline">info@boat-detailing-bodensee.de</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Bottom legal & copy -->
+            <div class="border-t border-navy-800 pt-8 flex flex-col sm:flex-row justify-between items-center text-[10px] text-gray-500 font-light gap-4">
+                <div>
+                    &copy; 2026 Boat Detailing Bodensee. Alle Rechte vorbehalten.
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#datenschutz" onclick="navigate('datenschutz')" class="hover:text-gold-500 transition duration-150">Datenschutz</a>
+                    <a href="#impressum" onclick="navigate('impressum')" class="hover:text-gold-500 transition duration-150">Impressum</a>
+                    <a href="#haftungsbeschraenkung" onclick="navigate('haftungsbeschraenkung')" class="hover:text-gold-500 transition duration-150">Haftungsbeschränkung</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
+        <!-- Floating Request Button (Gold Accent) -->
+        <a href="#kontakt" onclick="navigate('kontakt')" class="flex items-center justify-center w-14 h-14 rounded-full bg-gold-500 text-navy-900 shadow-2xl hover:scale-110 active:scale-95 transition-all duration-200" title="Termin anfragen">
+            <i class="fa-regular fa-calendar-check text-xl"></i>
+        </a>
+        <!-- Floating WhatsApp Quick Button -->
+        <a href="https://wa.me/4917612345678" target="_blank" class="flex items-center justify-center w-14 h-14 rounded-full bg-emerald-600 text-white shadow-2xl hover:scale-110 active:scale-95 transition-all duration-200" title="WhatsApp Chat">
+            <i class="fa-brands fa-whatsapp text-2xl"></i>
+        </a>
+        <!-- Floating Phone Quick Button -->
+        <a href="tel:+4917612345678" class="flex items-center justify-center w-14 h-14 rounded-full bg-navy-800 border border-gold-500 text-gold-500 shadow-2xl hover:scale-110 active:scale-95 transition-all duration-200" title="Anrufen">
+            <i class="fa-solid fa-phone text-lg"></i>
+        </a>
+    </div>
+
+    <script>
+        // Setup slider interaction for the Before/After Visualizer
+        const sliderContainer = document.getElementById('before-after-container');
+        const afterImageOverlay = document.getElementById('after-image-overlay');
+        const sliderHandle = document.getElementById('slider-handle');
+
+        let isDragging = false;
+
+        function updateSlider(clientX) {
+            const rect = sliderContainer.getBoundingClientRect();
+            let position = ((clientX - rect.left) / rect.width) * 100;
+            
+            // Constrain between 0% and 100%
+            if (position < 0) position = 0;
+            if (position > 100) position = 100;
+
+            // Apply clip-path to overlay and left position to handle
+            afterImageOverlay.style.clipPath = `inset(0 0 0 ${position}%)`;
+            sliderHandle.style.left = `${position}%`;
+        }
+
+        // Mouse listeners
+        sliderContainer.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            updateSlider(e.clientX);
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            updateSlider(e.clientX);
+        });
+
+        window.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        // Touch alternatives for mobile viewports
+        sliderContainer.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            updateSlider(e.touches[0].clientX);
+        });
+
+        window.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            updateSlider(e.touches[0].clientX);
+        });
+
+        window.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+        // Initialize values on window load
+        window.onload = function () {
+            updateCalculator();
+        };
+    </script>
+</body>
+</html>
