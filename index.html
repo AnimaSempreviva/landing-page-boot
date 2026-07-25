@@ -1573,61 +1573,10 @@
         </a>
     </div>
 
-    <script>
-        // Setup slider interaction for the Before/After Visualizer
-        const sliderContainer = document.getElementById('before-after-container');
-        const afterImageOverlay = document.getElementById('after-image-overlay');
-        const sliderHandle = document.getElementById('slider-handle');
-
-        let isDragging = false;
-
-        function updateSlider(clientX) {
-            const rect = sliderContainer.getBoundingClientRect();
-            let position = ((clientX - rect.left) / rect.width) * 100;
-            
-            // Constrain between 0% and 100%
-            if (position < 0) position = 0;
-            if (position > 100) position = 100;
-
-            // Apply clip-path to overlay and left position to handle
-            afterImageOverlay.style.clipPath = `inset(0 0 0 ${position}%)`;
-            sliderHandle.style.left = `${position}%`;
-        }
-
-        // Mouse listeners
-        sliderContainer.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            updateSlider(e.clientX);
-        });
-
-        window.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            updateSlider(e.clientX);
-        });
-
-        window.addEventListener('mouseup', () => {
-            isDragging = false;
-        });
-
-        // Touch alternatives for mobile viewports
-        sliderContainer.addEventListener('touchstart', (e) => {
-            isDragging = true;
-            updateSlider(e.touches[0].clientX);
-        });
-
-        window.addEventListener('touchmove', (e) => {
-            if (!isDragging) return;
-            updateSlider(e.touches[0].clientX);
-        });
-
-        window.addEventListener('touchend', () => {
-            isDragging = false;
-        });
-
-        // Initialize values on window load
-        window.onload = function () {
-            updateCalculator();
-        };
-    </script>
+  <script>
+    window.onload = function () {
+        updateCalculator();
+    };
+</script>
 </body>
 </html>
