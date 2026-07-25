@@ -151,7 +151,7 @@
                 const page = parts[0];
                 const subParam = parts[1] || null;
                 
-                if (['home', 'leistungen', 'preise', 'faq', 'ueber-uns', 'kontakt', 'standorte', 'blog', 'standort', 'impressum', 'datenschutz', 'haftungsbeschraenkung'].includes(page)) {
+                if (['home', 'leistungen', 'faq', 'ueber-uns', 'kontakt', 'standorte', 'blog', 'standort', 'impressum', 'datenschutz', 'haftungsbeschraenkung'].includes(page)) {
                     navigate(page, subParam);
                 } else {
                     navigate('home');
